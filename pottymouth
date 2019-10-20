@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+set -x
+
+# Set some defaults
+word_list_file="$HOME/.pottymouth"
+
+
+function exit_found {
+    echo "Found word: $1 in your repo."
+    exit 1
+}
+
+function ensure_word_file {
+    # Ensure we have a word file to grep off of.
+    [[ -r "$word_list_file" ]] || touch "$word_list_file"
+}
+
+function main {
+    ensure_word_file
+
+    # Search the current dir for a word
+    found_words=$(grep -f $word_list_file -iEnr .)
+    [[ ${found_words} ]] && exit 1
+    exit 0
+}
+
+main
+exit $?
