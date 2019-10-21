@@ -53,9 +53,13 @@ function get_pre_commit_hook_path {
 
 function make_git_hook {
     hook_file="$(get_pre_commit_hook_path)"
+    backup_hook_file="${hook_file}.backup"
 
     # Backup old pre-commit hook
-    [[ -f "${hook_file}" ]] && echo "backing up old pre-commit hook" && mv "${hook_file}" "${hook_file}.backup"
+    if [[ -f "${hook_file}" ]] ; then
+        echo "Backing up old your current pre-commit hook to ${backup_hook_file}"
+        mv "${hook_file}" "${backup_hook_file}"
+    fi
 
     # Now write the pre-commit hook
     echo "#!/usr/bin/env bash
@@ -72,7 +76,8 @@ exit \$?
 function ensure_word_file {
     # Ensure we have a word file to grep off of.
     if [[ ! -r "${word_list_file}" ]] ; then
-        echo "Creating pottymouth word list: ${word_list_file}"
+        echo "Creating pottymouth word-list: ${word_list_file}"
+        echo "Consider filling it with words from http://www.bannedwordlist.com/lists/swearWords.txt"
         echo "poop" > "${word_list_file}"
     fi
 }

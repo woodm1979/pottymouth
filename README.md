@@ -6,6 +6,7 @@ Prevent bad words in your commits
 
 I recently had a friend "jokingly" ask for a web-scraper to help prevent her
 from including words like `Poop` in open-source repos.
+I think a git pre-commit hook would be easier to write.
 This is my attempt to help.
 
 ## Setup
@@ -15,6 +16,8 @@ Optionally create a word-list file:
 ```bash
 ${EDITOR-vi} ~/.pottymouth
 ```
+
+Consider filling your word-list file with words from [this list](http://www.bannedwordlist.com/lists/swearWords.txt).
 
 ## Usage
 
