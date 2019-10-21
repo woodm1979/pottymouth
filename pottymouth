@@ -61,6 +61,8 @@ function make_git_hook {
     echo "#!/usr/bin/env bash
 
 ${this_script_abs_path} ${word_list_file_flag} ${modified_files_only_flag}
+echo ''
+echo 'Stopping your commit.  Use \"git commit -n\" to override this behavior.'
 exit \$?
 " > "${hook_file}"
     chmod a+x "${hook_file}"
