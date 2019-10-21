@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Set some useful variables
+this_script_abs_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+
 # Set some defaults
 word_list_file="$HOME/.pottymouth"
 make_git_hook="false"
@@ -57,7 +60,7 @@ function make_git_hook {
     # Now write the pre-commit hook
     echo "#!/usr/bin/env bash
 
-$0 ${word_list_file_flag} ${modified_files_only_flag}
+${this_script_abs_path} ${word_list_file_flag} ${modified_files_only_flag}
 exit \$?
 " > "${hook_file}"
     chmod a+x "${hook_file}"
