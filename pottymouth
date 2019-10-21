@@ -105,6 +105,7 @@ function main {
         echo "found some potty-mouth words:"
         echo "-----------------------------"
         echo "${found_words}"
+        echo "-----------------------------"
         exit 1
     fi
     exit 0
