@@ -16,7 +16,7 @@ modified_files_only_flag=""
 # Parse command line options
 while getopts ":hf:ag" Option
 do
-    case $Option in
+    case ${Option} in
         h) help="true";;
         f) word_list_file="${OPTARG}"
            word_list_file_flag="-f ${OPTARG}"
@@ -30,7 +30,7 @@ done
 
 
 function usage {
-    echo "usage: $0 [-h] [-f] [-a] [-g]
+    echo "usage: ${0} [-h] [-f] [-a] [-g]
     -h: Show this help message.
 
     -f <wordlist>: Specify a word-list file.  Defaults to ~/.pottymouth .
@@ -100,8 +100,8 @@ function main {
 
     found_words=$(grep -f "${word_list_file}" -iEn $(get_grep_targets))
     if [[ -n "${found_words}" ]]; then
-        echo "found pottymouth words:"
-        echo "-----------------------"
+        echo "found some potty-mouth words:"
+        echo "-----------------------------"
         echo "${found_words}"
         exit 1
     fi
