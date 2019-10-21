@@ -6,32 +6,61 @@ make_git_hook="false"
 modified_files_only="true"
 help="false"
 
+# Set default flags for within a potential git hook.
+word_list_file_flag=""
+modified_files_only_flag=""
+
 # Parse command line options
 while getopts ":hf:ag" Option
 do
     case $Option in
         h) help="true";;
-        f) word_list_file="${OPTARG}";;
-        a) modified_files_only="false";;
+        f) word_list_file="${OPTARG}"
+           word_list_file_flag="-f ${OPTARG}"
+           ;;
+        a) modified_files_only="false"
+           modified_files_only_flag="-a"
+           ;;
         g) make_git_hook="true";;
     esac
 done
 
 
 function usage {
-    echo "usage: $0 [-h] [-f] [-a] [-g]"
-    echo "    -h: Show this help message."
-    echo ""
-    echo "    -f <wordlist>: Specify a word-list file.  Defaults to ~/.pottymouth ."
-    echo "    -a: Check all files in the repo.  Defaults to only checking modified files."
-    echo ""
-    echo "    -g: Make a git-hook.  That hook will use the remainder of the options if specified (-f, -a, ...)"
+    echo "usage: $0 [-h] [-f] [-a] [-g]
+    -h: Show this help message.
+
+    -f <wordlist>: Specify a word-list file.  Defaults to ~/.pottymouth .
+    -a: Check all files in the repo.  Defaults to only checking modified files.
+
+    -g: Make a git pre-commit hook.  That hook will use the remainder of the options if specified (-f, -a, ...)"
     exit 2
 }
 
 
+function get_git_root {
+    git rev-parse --show-toplevel
+}
+
+
+function get_pre_commit_hook_path {
+    echo "$(get_git_root)/.git/hooks/pre-commit"
+}
+
+
 function make_git_hook {
-    echo "not implemented yet"
+    hook_file="$(get_pre_commit_hook_path)"
+
+    # Backup old pre-commit hook
+    [[ -f "${hook_file}" ]] && echo "backing up old pre-commit hook" && mv "${hook_file}" "${hook_file}.backup"
+
+    # Now write the pre-commit hook
+    echo "#!/usr/bin/env bash
+
+$0 ${word_list_file_flag} ${modified_files_only_flag}
+exit \$?
+" > "${hook_file}"
+    chmod a+x "${hook_file}"
 }
 
 
@@ -47,7 +76,7 @@ function get_grep_targets {
         git diff --name-only
     else
         # Make sure we start our recursive grep at the root of the git repo.
-        echo "-r $(git rev-parse --show-toplevel)"
+        echo "-r $(get_git_root)"
     fi
 }
 
@@ -57,10 +86,16 @@ function main {
 
     ensure_word_file
 
+    if [[ ${make_git_hook} == "true" ]] ; then
+        make_git_hook
+        exit $?
+    fi
+
+
     found_words=$(grep -f "${word_list_file}" -iEn $(get_grep_targets))
     if [[ -n "${found_words}" ]]; then
-        echo "found words:"
-        echo "------------"
+        echo "found pottymouth words:"
+        echo "-----------------------"
         echo "${found_words}"
         exit 1
     fi
