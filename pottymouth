@@ -1,29 +1,65 @@
 #!/usr/bin/env bash
 
-set -x
-
 # Set some defaults
 word_list_file="$HOME/.pottymouth"
+make_git_hook="false"
+modified_files_only="true"
+help="false"
 
 
-function exit_found {
-    echo "Found word: $1 in your repo."
-    exit 1
+while getopts ":hf:ag" Option
+do
+    case $Option in
+        h) help="true";;
+        f) word_list_file="${OPTARG}";;
+        a) modified_files_only="false";;
+        g) make_git_hook="true";;
+    esac
+done
+
+
+function usage {
+    echo "TODO: Print help/usage."
+    exit 2
 }
+
+
+function make_git_hook {
+    echo "not implemented yet"
+}
+
 
 function ensure_word_file {
     # Ensure we have a word file to grep off of.
-    [[ -r "$word_list_file" ]] || touch "$word_list_file"
+    [[ -r "${word_list_file}" ]] || touch "${word_list_file}" && echo "Created pottymouth word list: ${word_list_file}"
 }
 
+
+function get_grep_targets {
+    if [[ ${modified_files_only} == "true" ]] ; then
+        # Find all the files that have changed.
+        git diff --name-only
+    else
+        # Make sure we start our recursive grep at the root of the git repo.
+        echo "-r $(git rev-parse --show-toplevel)"
+    fi
+}
+
+
 function main {
+    [[ ${help} == "true" ]] && usage
+
     ensure_word_file
 
-    # Search the current dir for a word
-    found_words=$(grep -f $word_list_file -iEnr .)
-    [[ ${found_words} ]] && exit 1
+    found_words=$(grep -f "${word_list_file}" -iEn $(get_grep_targets))
+    if [[ -n "${found_words}" ]]; then
+        echo "found words:"
+        echo "------------"
+        echo "${found_words}"
+        exit 1
+    fi
     exit 0
 }
 
+
 main
-exit $?
