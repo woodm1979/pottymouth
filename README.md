@@ -9,6 +9,8 @@ from including words like `Poop` in open-source repos.
 I think a git pre-commit hook would be easier to write.
 This is my attempt to help.
 
+In retrospect, this should likely be a gist, but I just don't like them very much.
+
 ## Setup
 
 Optionally create a word-list file:
