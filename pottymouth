@@ -69,7 +69,10 @@ exit \$?
 
 function ensure_word_file {
     # Ensure we have a word file to grep off of.
-    [[ -r "${word_list_file}" ]] || touch "${word_list_file}" && echo "Created pottymouth word list: ${word_list_file}"
+    if [[ ! -r "${word_list_file}" ]] ; then
+        echo "Creating pottymouth word list: ${word_list_file}"
+        echo "poop" > "${word_list_file}"
+    fi
 }
 
 
